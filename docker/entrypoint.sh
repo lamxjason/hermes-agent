@@ -71,8 +71,13 @@ if [ ! -f "$HERMES_HOME/.env" ]; then
     cp "$INSTALL_DIR/.env.example" "$HERMES_HOME/.env"
 fi
 
-# config.yaml
-if [ ! -f "$HERMES_HOME/config.yaml" ]; then
+# config.yaml — fork override: if a canonical config.yaml is baked into the
+# image at $INSTALL_DIR/config.yaml, sync it to the PVC on every boot so
+# pushes to this repo flow through to the running pod. Falls back to the
+# upstream "preserve existing, seed from example" behavior otherwise.
+if [ -f "$INSTALL_DIR/config.yaml" ]; then
+    cp "$INSTALL_DIR/config.yaml" "$HERMES_HOME/config.yaml"
+elif [ ! -f "$HERMES_HOME/config.yaml" ]; then
     cp "$INSTALL_DIR/cli-config.yaml.example" "$HERMES_HOME/config.yaml"
 fi
 
